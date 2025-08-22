@@ -1,1 +1,339 @@
-# dalseong-ai-on
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>달성 AI-ON | 달성군 학생을 위한 생성형 AI 통합 플랫폼</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 450px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .tab-active {
+            border-color: #0d9488;
+            color: #0d9488;
+            font-weight: 700;
+        }
+        .smooth-scroll {
+            scroll-behavior: smooth;
+        }
+        .token-flow-item {
+            transition: all 0.3s ease-in-out;
+        }
+        .token-flow-item.active {
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            border-color: #f97316;
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800 smooth-scroll">
+    <!-- Chosen Palette: Warm Educational Harmony -->
+    <!-- Application Structure Plan: A thematic single-page scrolling application designed for intuitive exploration. The structure is not a mirror of the report but a user-centric flow: 1. Hero Section (The 'What'): Grabs attention with the core vision. 2. Background Section (The 'Why'): Uses interactive cards to explain the problem. 3. Core Features Section (The 'How'): Employs a tabbed interface and a visual diagram to detail the platform, token system, and management. This breaks down complex information into digestible chunks. 4. Impact Section (The 'Result'): Uses an interactive chart to visualize the expected outcomes. This structure guides the user from the general vision to specific details and finally to the positive impact, creating a compelling narrative. -->
+    <!-- Visualization & Content Choices: 1. Token System (Report Info: Token provision, usage, earning) -> Goal: Organize/Explain Process -> Viz: Interactive HTML/CSS Flow Diagram -> Interaction: Clicking each stage highlights it and updates a text description, making the process easy to follow. -> Justification: More engaging than a static list and avoids SVG. 2. Expected Outcomes (Report Info: Benefits for students, education field, foundation) -> Goal: Inform/Compare -> Viz: Chart.js Donut Chart -> Interaction: Clicking a chart segment updates a detailed text block, directly linking the visual data to its meaning. -> Justification: Effectively shows parts of a whole (total impact) and interactivity enhances user engagement. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-teal-700">달성 AI-ON</h1>
+            <div class="hidden md:flex space-x-8">
+                <a href="#vision" class="text-stone-600 hover:text-teal-600">사업 비전</a>
+                <a href="#how" class="text-stone-600 hover:text-teal-600">핵심 내용</a>
+                <a href="#impact" class="text-stone-600 hover:text-teal-600">기대 효과</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="hero" class="bg-teal-50 py-20 md:py-32">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-4xl md:text-6xl font-black text-teal-800 mb-4">미래를 여는 새로운 경험</h2>
+                <p class="text-lg md:text-2xl font-bold text-teal-700 mb-8">달성군 학생 누구나, 생성형 AI를 마음껏 탐색하고 배우는<br class="hidden md:block"> '달성 AI-ON' 플랫폼을 시작합니다.</p>
+                <p class="max-w-3xl mx-auto text-stone-600">
+                    통합 계정과 토큰 시스템을 통해 다양한 AI 서비스를 자유롭게 활용하며, 미래 사회의 핵심 역량인 디지털 리터러시와 창의적 문제 해결 능력을 갖춘 인재로 성장할 수 있도록 지원합니다.
+                </p>
+            </div>
+        </section>
+
+        <section id="vision" class="py-16 md:py-24">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl md:text-4xl font-bold mb-2">왜 '달성 AI-ON'이 필요한가요?</h3>
+                    <p class="text-stone-600">우리는 교육 현장의 기회 불균형을 해소하고, 모든 학생에게 미래를 준비할 동등한 출발선을 제공하고자 합니다.</p>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="bg-white p-8 rounded-lg shadow-md border border-stone-200">
+                        <div class="text-3xl text-amber-500 mb-4">🚀</div>
+                        <h4 class="text-xl font-bold mb-2">미래 교육 필수 도구</h4>
+                        <p class="text-stone-600">생성형 AI는 이제 학습과 창작의 핵심 도구입니다. 공교육 현장에서의 선제적 도입이 필수적입니다.</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-md border border-stone-200">
+                        <div class="text-3xl text-amber-500 mb-4">🌱</div>
+                        <h4 class="text-xl font-bold mb-2">교육 기회 균등</h4>
+                        <p class="text-stone-600">고가의 유료 AI 서비스를 누구나 이용할 수 있도록 지원하여 AI 활용 경험의 격차를 해소합니다.</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-md border border-stone-200">
+                        <div class="text-3xl text-amber-500 mb-4">🎨</div>
+                        <h4 class="text-xl font-bold mb-2">다채로운 AI 경험</h4>
+                        <p class="text-stone-600">하나의 플랫폼에서 텍스트, 이미지, 코드 등 다양한 생성형 AI를 비교하고 체험하는 환경을 제공합니다.</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-md border border-stone-200">
+                        <div class="text-3xl text-amber-500 mb-4">💡</div>
+                        <h4 class="text-xl font-bold mb-2">교육적 동기 부여</h4>
+                        <p class="text-stone-600">재단 프로그램 참여 및 미션 수행과 연계하여 학생들의 자발적인 참여와 성장을 유도합니다.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="how" class="py-16 md:py-24 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl md:text-4xl font-bold mb-2">'달성 AI-ON'은 어떻게 운영되나요?</h3>
+                    <p class="text-stone-600">통합 플랫폼, 토큰 시스템, 체계적인 운영 관리를 통해 학생들의 AI 경험을 지원합니다.</p>
+                </div>
+                
+                <div class="max-w-4xl mx-auto">
+                    <div class="border-b border-stone-200 mb-8">
+                        <nav class="-mb-px flex space-x-6" aria-label="Tabs">
+                            <button class="tab-btn tab-active whitespace-nowrap py-4 px-1 border-b-2 font-medium text-lg" data-tab="platform">통합 플랫폼</button>
+                            <button class="tab-btn text-stone-500 hover:text-stone-700 hover:border-stone-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-lg" data-tab="token">토큰 시스템</button>
+                            <button class="tab-btn text-stone-500 hover:text-stone-700 hover:border-stone-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-lg" data-tab="management">운영 및 관리</button>
+                        </nav>
+                    </div>
+
+                    <div id="tab-content">
+                        <div class="tab-panel" data-tab-content="platform">
+                            <h4 class="text-2xl font-bold mb-4 text-teal-700">하나의 계정, 무한한 가능성</h4>
+                            <p class="text-stone-600 mb-6">하나의 계정으로 ChatGPT, Claude, Midjourney 등 세계적인 생성형 AI 모델에 자유롭게 접근할 수 있는 웹 기반 플랫폼을 구축합니다. 또한, 학생 수준에 맞는 AI 윤리 교육과 활용 가이드 콘텐츠를 탑재하여 올바른 AI 사용 문화를 만들어갑니다.</p>
+                            <div class="flex flex-wrap gap-4">
+                                <span class="bg-teal-100 text-teal-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded">#통합계정</span>
+                                <span class="bg-teal-100 text-teal-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded">#다양한AI모델</span>
+                                <span class="bg-teal-100 text-teal-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded">#AI윤리교육</span>
+                            </div>
+                        </div>
+                        <div class="tab-panel hidden" data-tab-content="token">
+                            <h4 class="text-2xl font-bold mb-4 text-teal-700">학습을 장려하는 토큰 시스템</h4>
+                            <p class="text-stone-600 mb-6">AI 사용 경험을 게임처럼 즐겁게 만듭니다. 매월 기본 토큰이 충전되고, 재단 프로그램 참여나 미션 수행을 통해 추가 토큰을 획득하며 더 깊이있는 AI 탐색이 가능해집니다. 아래 항목을 클릭하여 자세한 내용을 확인해보세요.</p>
+                            
+                            <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-0 my-8">
+                                <div id="token-base" class="token-flow-item active cursor-pointer bg-white p-6 rounded-lg shadow-sm border-2 border-transparent w-full md:w-1/3 text-center">
+                                    <div class="text-2xl mb-2">🎁</div>
+                                    <h5 class="font-bold">기본 제공</h5>
+                                </div>
+                                <div class="text-2xl text-stone-400 mx-4 hidden md:block">→</div>
+                                <div id="token-usage" class="token-flow-item cursor-pointer bg-white p-6 rounded-lg shadow-sm border-2 border-transparent w-full md:w-1/3 text-center">
+                                    <div class="text-2xl mb-2">💻</div>
+                                    <h5 class="font-bold">AI 사용</h5>
+                                </div>
+                                <div class="text-2xl text-stone-400 mx-4 hidden md:block">→</div>
+                                <div id="token-earn" class="token-flow-item cursor-pointer bg-white p-6 rounded-lg shadow-sm border-2 border-transparent w-full md:w-1/3 text-center">
+                                    <div class="text-2xl mb-2">🌟</div>
+                                    <h5 class="font-bold">추가 획득</h5>
+                                </div>
+                            </div>
+                            <div id="token-description" class="bg-stone-100 p-6 rounded-lg text-center min-h-[100px] flex items-center justify-center">
+                                <p class="text-stone-700"></p>
+                            </div>
+                        </div>
+                        <div class="tab-panel hidden" data-tab-content="management">
+                            <h4 class="text-2xl font-bold mb-4 text-teal-700">체계적인 지원과 데이터 기반 교육</h4>
+                            <p class="text-stone-600 mb-6">달성군 소재 초·중·고등학생 전체를 대상으로 하며, 달성교육재단 예산을 재원으로 안정적으로 운영됩니다. 학생별 토큰 사용 데이터를 익명으로 분석하여, 더 나은 AI 교육 정책을 수립하고 피드백하는 선순환 구조를 만들어갑니다.</p>
+                             <div class="flex flex-wrap gap-4">
+                                <span class="bg-orange-100 text-orange-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded">#달성군 전체 학생</span>
+                                <span class="bg-orange-100 text-orange-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded">#안정적 재원</span>
+                                <span class="bg-orange-100 text-orange-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded">#데이터 기반 정책</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="impact" class="py-16 md:py-24">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl md:text-4xl font-bold mb-2">'달성 AI-ON'이 가져올 긍정적 변화</h3>
+                    <p class="text-stone-600">학생, 교육 현장, 그리고 지역 사회 모두가 함께 성장하는 미래를 그립니다. 차트의 항목을 클릭해보세요.</p>
+                </div>
+                <div class="flex flex-col lg:flex-row items-center gap-8">
+                    <div class="w-full lg:w-1/2">
+                        <div class="chart-container">
+                            <canvas id="impactChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="w-full lg:w-1/2">
+                        <div id="impact-description" class="bg-white p-8 rounded-lg shadow-md border border-stone-200 min-h-[200px]">
+                            <h4 id="impact-title" class="text-2xl font-bold text-teal-700 mb-4"></h4>
+                            <p id="impact-text" class="text-stone-600"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-stone-800 text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2025 달성 AI-ON. All rights reserved.</p>
+            <p class="text-sm text-stone-400 mt-2">달성교육재단과 함께 달성군 학생들의 미래를 만들어갑니다.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabPanels = document.querySelectorAll('.tab-panel');
+            const tokenFlowItems = document.querySelectorAll('.token-flow-item');
+            const tokenDescriptionEl = document.getElementById('token-description').querySelector('p');
+
+            const tokenData = {
+                'token-base': '매월 모든 학생에게 AI 서비스를 이용할 수 있는 일정량의 사용 토큰이 자동으로 충전됩니다.',
+                'token-usage': '플랫폼 내에서 AI 서비스를 이용할 때, 모델의 종류나 사용량에 따라 토큰이 차감됩니다.',
+                'token-earn': '재단 프로그램 참여, AI 윤리 퀴즈, 프로젝트 과제 등 다양한 미션을 완료하면 인센티브 토큰을 추가로 받을 수 있습니다.'
+            };
+
+            const impactData = {
+                '학생': {
+                    title: '학생: 자기주도적 성장과 진로 탐색',
+                    text: '경제적 부담 없이 최신 AI 기술을 마음껏 활용하며 자기주도적 학습 능력과 창의력을 키웁니다. 이를 통해 미래 사회가 요구하는 역량을 갖추고 자신의 진로를 탐색하는 중요한 기회를 가집니다.'
+                },
+                '교육 현장': {
+                    title: '교육 현장: 혁신적 교육 모델과 격차 해소',
+                    text: 'AI를 활용한 혁신적인 교수-학습 모델을 학교 현장에 적용할 수 있는 기반을 마련합니다. 모든 학생에게 동등한 디지털 교육 기회를 제공하여 교육 격차를 해소하는 데 기여합니다.'
+                },
+                '달성교육재단': {
+                    title: '달성교육재단: 미래 교육 복지 실현',
+                    text: '지역 학생들을 위한 실질적이고 미래지향적인 교육 복지를 실현합니다. 또한, 재단이 주최하는 다양한 프로그램에 대한 학생들의 관심과 참여율을 획기적으로 높이는 계기가 될 것입니다.'
+                }
+            };
+
+            function updateTokenDescription(key) {
+                tokenDescriptionEl.textContent = tokenData[key];
+                tokenFlowItems.forEach(item => {
+                    item.classList.remove('active');
+                    if(item.id === key) {
+                        item.classList.add('active');
+                    }
+                });
+            }
+
+            updateTokenDescription('token-base');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    tabButtons.forEach(btn => btn.classList.remove('tab-active', 'text-stone-500', 'hover:text-stone-700', 'hover:border-stone-300'));
+                    tabButtons.forEach(btn => {
+                        if(btn !== button) {
+                            btn.classList.add('text-stone-500', 'hover:text-stone-700', 'hover:border-stone-300');
+                        }
+                    });
+                    button.classList.add('tab-active');
+
+                    const tab = button.dataset.tab;
+                    tabPanels.forEach(panel => {
+                        if (panel.dataset.tabContent === tab) {
+                            panel.classList.remove('hidden');
+                        } else {
+                            panel.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+
+            tokenFlowItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    updateTokenDescription(item.id);
+                });
+            });
+
+            const ctx = document.getElementById('impactChart').getContext('2d');
+            const impactChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['학생', '교육 현장', '달성교육재단'],
+                    datasets: [{
+                        label: '기대 효과',
+                        data: [45, 30, 25],
+                        backgroundColor: [
+                            'rgba(13, 148, 136, 0.7)',
+                            'rgba(249, 115, 22, 0.7)',
+                            'rgba(245, 158, 11, 0.7)'
+                        ],
+                        borderColor: [
+                            '#0d9488',
+                            '#f97316',
+                            '#f59e0b'
+                        ],
+                        borderWidth: 2,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.raw}%`;
+                                }
+                            }
+                        }
+                    },
+                    onClick: (event, elements) => {
+                        if (elements.length > 0) {
+                            const chartElement = elements[0];
+                            const label = impactChart.data.labels[chartElement.index];
+                            updateImpactDescription(label);
+                        }
+                    }
+                }
+            });
+
+            const impactTitleEl = document.getElementById('impact-title');
+            const impactTextEl = document.getElementById('impact-text');
+
+            function updateImpactDescription(label) {
+                const data = impactData[label];
+                if (data) {
+                    impactTitleEl.textContent = data.title;
+                    impactTextEl.textContent = data.text;
+                }
+            }
+
+            updateImpactDescription('학생');
+            
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
