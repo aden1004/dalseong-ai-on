@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>달성 AI-ON | 생성형 AI 퀴즈</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; }
+        .smooth-scroll { scroll-behavior: smooth; }
+
+        .choice-btn {
+            transition: all 0.18s ease-in-out;
+        }
+        .choice-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            border-color: #0d9488;
+            background-color: #f0fdfa;
+        }
+        .choice-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.95;
+        }
+        .choice-correct {
+            background-color: #ecfdf5 !important;
+            border-color: #10b981 !important;
+            color: #065f46 !important;
+        }
+        .choice-wrong {
+            background-color: #fef2f2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b !important;
+        }
+        .choice-selected-correct::after {
+            content: " ✓";
+            font-weight: 900;
+        }
+        .choice-selected-wrong::after {
+            content: " ✗";
+            font-weight: 900;
+        }
+
+        .progress-bar-inner {
+            transition: width 0.35s ease;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.35s ease both;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800 smooth-scroll">
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-teal-700">달성 AI-ON</a>
+            <div class="hidden md:flex space-x-8">
+                <a href="index.html#vision" class="text-stone-600 hover:text-teal-600">사업 비전</a>
+                <a href="index.html#how" class="text-stone-600 hover:text-teal-600">핵심 내용</a>
+                <a href="index.html#impact" class="text-stone-600 hover:text-teal-600">기대 효과</a>
+                <a href="quiz.html" class="text-teal-700 font-bold">AI 퀴즈</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 md:px-6 py-10 md:py-16">
+        <section class="text-center mb-8 md:mb-12">
+            <h2 class="text-3xl md:text-5xl font-black text-teal-800 mb-3">생성형 AI 학습 퀴즈</h2>
+            <p class="text-stone-600 max-w-2xl mx-auto">
+                생성형 AI의 개념과 올바른 활용, 그리고 '달성 AI-ON' 플랫폼에 대한 이해를 점검해보세요.
+                각 문항을 풀면 곧바로 정답과 해설이 표시됩니다.
+            </p>
+        </section>
+
+        <!-- Start screen -->
+        <section id="start-screen" class="max-w-2xl mx-auto bg-white rounded-2xl shadow-md border border-stone-200 p-8 md:p-10 text-center fade-in">
+            <div class="text-5xl mb-4">🧠</div>
+            <h3 class="text-2xl font-bold mb-2">퀴즈를 시작할까요?</h3>
+            <p class="text-stone-600 mb-2">총 <span id="total-count-pre" class="font-bold text-teal-700"></span>문항이 출제됩니다.</p>
+            <p class="text-stone-500 text-sm mb-6">제한 시간은 없으며, 한 문항씩 풀고 바로 해설을 확인할 수 있어요.</p>
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                <button id="start-btn"
+                    class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-lg shadow-sm transition">
+                    퀴즈 시작하기
+                </button>
+                <button id="shuffle-toggle"
+                    class="bg-white border border-stone-300 hover:border-teal-500 text-stone-700 font-medium py-3 px-6 rounded-lg transition"
+                    aria-pressed="true">
+                    문항 순서 섞기: <span id="shuffle-state" class="font-bold text-teal-700">ON</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Quiz screen -->
+        <section id="quiz-screen" class="max-w-2xl mx-auto hidden">
+            <div class="mb-4 flex items-center justify-between text-sm text-stone-600">
+                <span>문항 <span id="current-index" class="font-bold text-teal-700">1</span> / <span id="total-count">10</span></span>
+                <span>점수 <span id="score" class="font-bold text-teal-700">0</span></span>
+            </div>
+            <div class="w-full bg-stone-200 rounded-full h-2 mb-6 overflow-hidden">
+                <div id="progress-bar" class="progress-bar-inner bg-teal-600 h-2 rounded-full" style="width: 0%"></div>
+            </div>
+
+            <div id="question-card" class="bg-white rounded-2xl shadow-md border border-stone-200 p-6 md:p-8 fade-in">
+                <div class="flex items-center gap-2 mb-3">
+                    <span id="question-type-badge" class="text-xs font-bold px-2 py-1 rounded bg-teal-100 text-teal-800">객관식</span>
+                    <span id="question-category-badge" class="text-xs font-medium px-2 py-1 rounded bg-stone-100 text-stone-600"></span>
+                </div>
+                <h3 id="question-text" class="text-xl md:text-2xl font-bold mb-6 leading-snug"></h3>
+
+                <div id="choices" class="space-y-3"></div>
+
+                <div id="feedback" class="hidden mt-6 p-4 rounded-lg border-l-4 fade-in">
+                    <p id="feedback-title" class="font-bold mb-1"></p>
+                    <p id="feedback-text" class="text-stone-700 text-sm leading-relaxed"></p>
+                </div>
+
+                <div class="mt-6 flex justify-between items-center">
+                    <button id="quit-btn" class="text-stone-500 hover:text-stone-700 text-sm">처음으로</button>
+                    <button id="next-btn"
+                        class="hidden bg-teal-600 hover:bg-teal-700 text-white font-bold py-2.5 px-6 rounded-lg shadow-sm transition">
+                        다음 문항 →
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Result screen -->
+        <section id="result-screen" class="max-w-2xl mx-auto hidden">
+            <div class="bg-white rounded-2xl shadow-md border border-stone-200 p-8 md:p-10 text-center fade-in">
+                <div id="result-emoji" class="text-6xl mb-4">🎉</div>
+                <h3 class="text-2xl md:text-3xl font-black mb-2">퀴즈 완료!</h3>
+                <p class="text-stone-600 mb-6">
+                    <span id="final-score" class="text-3xl font-black text-teal-700">0</span>
+                    <span class="text-stone-500"> / </span>
+                    <span id="final-total" class="text-xl font-bold text-stone-700">0</span>
+                </p>
+                <p id="result-message" class="text-stone-700 mb-8"></p>
+
+                <div id="review-list" class="text-left space-y-3 max-h-96 overflow-y-auto pr-1 mb-8"></div>
+
+                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                    <button id="restart-btn"
+                        class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-lg shadow-sm transition">
+                        다시 풀기
+                    </button>
+                    <a href="index.html"
+                        class="bg-white border border-stone-300 hover:border-teal-500 text-stone-700 font-medium py-3 px-6 rounded-lg transition inline-flex items-center justify-center">
+                        메인으로 돌아가기
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-stone-800 text-white py-8 mt-10">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2025 달성 AI-ON. All rights reserved.</p>
+            <p class="text-sm text-stone-400 mt-2">달성교육재단과 함께 달성군 학생들의 미래를 만들어갑니다.</p>
+        </div>
+    </footer>
+
+    <script>
+        // === 퀴즈 데이터 ===
+        // type: 'mcq' (객관식) | 'tf' (참/거짓)
+        const QUESTIONS = [
+            {
+                type: 'mcq',
+                category: '생성형 AI 기초',
+                question: "'생성형 AI(Generative AI)'에 대한 가장 적절한 설명은 무엇인가요?",
+                choices: [
+                    "사람이 입력한 데이터를 그대로 저장하고 검색해주는 기술",
+                    "학습한 데이터를 바탕으로 새로운 텍스트·이미지·코드 등을 만들어내는 기술",
+                    "정해진 규칙대로만 답하는 단순 자동응답 프로그램",
+                    "인터넷 검색 결과를 순위대로 보여주는 검색 엔진"
+                ],
+                answer: 1,
+                explanation: "생성형 AI는 대규모 데이터를 학습한 모델이 새로운 텍스트·이미지·코드 등 '결과물'을 생성하는 기술입니다. 단순 검색이나 규칙 기반 응답과 구분됩니다."
+            },
+            {
+                type: 'mcq',
+                category: '대표 모델',
+                question: "다음 중 '대표적인 생성형 AI 서비스'에 해당하지 않는 것은?",
+                choices: [
+                    "ChatGPT",
+                    "Claude",
+                    "Midjourney",
+                    "Microsoft Excel"
+                ],
+                answer: 3,
+                explanation: "ChatGPT·Claude는 텍스트 생성 AI, Midjourney는 이미지 생성 AI입니다. Excel은 표 계산 소프트웨어로 생성형 AI 서비스가 아닙니다."
+            },
+            {
+                type: 'tf',
+                category: 'AI 윤리',
+                question: "AI가 만든 글을 출처 표시 없이 그대로 제출해도 표절이 아니다.",
+                answer: 1, // 0: 참, 1: 거짓
+                explanation: "AI가 생성한 결과물을 자신의 창작물처럼 제출하는 것은 학문적·창작적 정직성에 어긋납니다. AI 활용 사실을 밝히고 출처와 사용 범위를 명시해야 합니다."
+            },
+            {
+                type: 'mcq',
+                category: '프롬프트',
+                question: "AI에게 더 좋은 답을 얻기 위한 '프롬프트(prompt) 작성' 팁으로 가장 적절한 것은?",
+                choices: [
+                    "최대한 짧고 모호하게 한 단어만 입력한다",
+                    "원하는 형식·대상·조건·예시 등을 구체적으로 명시한다",
+                    "같은 질문을 빠르게 여러 번 반복 전송한다",
+                    "개인정보를 최대한 많이 함께 입력한다"
+                ],
+                answer: 1,
+                explanation: "좋은 프롬프트는 '맥락 + 목적 + 형식 + 조건'을 구체적으로 담는 것이 핵심입니다. 개인정보 입력은 절대 피해야 합니다."
+            },
+            {
+                type: 'mcq',
+                category: 'AI 윤리',
+                question: "AI를 사용할 때 가장 주의해야 할 점은?",
+                choices: [
+                    "결과를 무조건 신뢰하고 그대로 사용한다",
+                    "개인정보·민감정보를 자유롭게 입력한다",
+                    "AI의 답변을 사실 확인 없이 그대로 인용한다",
+                    "개인정보를 보호하고, 결과는 비판적으로 검토하며 사실을 확인한다"
+                ],
+                answer: 3,
+                explanation: "AI는 사실과 다른 정보를 그럴듯하게 만들어내는 '환각(hallucination)' 현상이 있을 수 있습니다. 개인정보 보호와 비판적 검토는 필수입니다."
+            },
+            {
+                type: 'tf',
+                category: 'AI 한계',
+                question: "AI 챗봇이 제시하는 정보는 항상 100% 사실이다.",
+                answer: 1,
+                explanation: "AI는 학습 데이터에 기반해 답하므로 잘못된 정보나 오래된 정보를 사실처럼 생성할 수 있습니다. 중요한 정보는 반드시 신뢰할 수 있는 출처로 교차 확인해야 합니다."
+            },
+            {
+                type: 'mcq',
+                category: '달성 AI-ON',
+                question: "'달성 AI-ON' 플랫폼이 추구하는 핵심 목적이 아닌 것은?",
+                choices: [
+                    "AI 활용 경험의 격차 해소",
+                    "하나의 통합 계정으로 다양한 AI 서비스 이용",
+                    "학생 개인 정보를 외부에 판매하기",
+                    "디지털 리터러시와 창의적 문제 해결 역량 강화"
+                ],
+                answer: 2,
+                explanation: "'달성 AI-ON'은 교육 기회 균등, 통합 계정 기반 AI 경험, 미래 역량 강화를 목표로 합니다. 학생 정보 판매는 결코 목적이 될 수 없으며, 토큰 사용 데이터는 '익명'으로만 분석합니다."
+            },
+            {
+                type: 'mcq',
+                category: '달성 AI-ON',
+                question: "'달성 AI-ON'의 토큰 시스템에 대한 설명으로 옳은 것은?",
+                choices: [
+                    "토큰은 학생이 직접 돈을 내고 구매해야 한다",
+                    "매월 기본 토큰이 제공되고, 미션 수행 시 추가 획득이 가능하다",
+                    "한 번 받은 토큰은 평생 줄어들지 않는다",
+                    "교사만 토큰을 사용할 수 있다"
+                ],
+                answer: 1,
+                explanation: "매월 모든 학생에게 기본 토큰이 충전되고, AI 사용 시 차감되며, 재단 프로그램 참여·미션 수행 등으로 추가 토큰을 획득할 수 있습니다."
+            },
+            {
+                type: 'tf',
+                category: '달성 AI-ON',
+                question: "'달성 AI-ON'은 달성군 소재 초·중·고등학생 전체를 대상으로 한다.",
+                answer: 0,
+                explanation: "달성 AI-ON은 달성군 내 초·중·고 학생 전체를 대상으로 하며, 달성교육재단 예산으로 안정적으로 운영됩니다."
+            },
+            {
+                type: 'mcq',
+                category: '저작권',
+                question: "AI가 만든 이미지를 학교 과제에 활용할 때 가장 바람직한 태도는?",
+                choices: [
+                    "내가 직접 그린 것처럼 제출한다",
+                    "AI로 생성했다는 사실을 밝히고, 사용한 도구와 프롬프트를 함께 명시한다",
+                    "출처를 숨기고 친구에게도 공유하지 않는다",
+                    "AI 결과물은 학교에 절대 사용할 수 없다"
+                ],
+                answer: 1,
+                explanation: "AI 활용 사실을 투명하게 밝히는 것이 학문적 정직성의 기본입니다. 사용한 도구·프롬프트·수정 과정을 함께 기록하면 더욱 좋습니다."
+            }
+        ];
+
+        // === 상태 ===
+        const state = {
+            order: [],
+            current: 0,
+            score: 0,
+            answers: [],          // {qIndex, selected, correct}
+            answered: false,
+            shuffle: true
+        };
+
+        // === DOM ===
+        const $ = (sel) => document.querySelector(sel);
+        const startScreen   = $('#start-screen');
+        const quizScreen    = $('#quiz-screen');
+        const resultScreen  = $('#result-screen');
+
+        const totalCountPre = $('#total-count-pre');
+        const totalCountEl  = $('#total-count');
+        const currentIdxEl  = $('#current-index');
+        const scoreEl       = $('#score');
+        const progressBar   = $('#progress-bar');
+
+        const qTypeBadge    = $('#question-type-badge');
+        const qCatBadge     = $('#question-category-badge');
+        const qTextEl       = $('#question-text');
+        const choicesEl     = $('#choices');
+
+        const feedbackEl     = $('#feedback');
+        const feedbackTitle  = $('#feedback-title');
+        const feedbackText   = $('#feedback-text');
+
+        const nextBtn       = $('#next-btn');
+        const quitBtn       = $('#quit-btn');
+        const startBtn      = $('#start-btn');
+        const restartBtn    = $('#restart-btn');
+        const shuffleToggle = $('#shuffle-toggle');
+        const shuffleState  = $('#shuffle-state');
+
+        const finalScoreEl  = $('#final-score');
+        const finalTotalEl  = $('#final-total');
+        const resultEmoji   = $('#result-emoji');
+        const resultMsg     = $('#result-message');
+        const reviewListEl  = $('#review-list');
+
+        totalCountPre.textContent = QUESTIONS.length;
+        totalCountEl.textContent  = QUESTIONS.length;
+
+        // === 유틸 ===
+        function shuffleArray(arr) {
+            const a = arr.slice();
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function startQuiz() {
+            state.order = state.shuffle
+                ? shuffleArray(QUESTIONS.map((_, i) => i))
+                : QUESTIONS.map((_, i) => i);
+            state.current = 0;
+            state.score = 0;
+            state.answers = [];
+            state.answered = false;
+
+            startScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const qIndex = state.order[state.current];
+            const q = QUESTIONS[qIndex];
+
+            state.answered = false;
+            feedbackEl.classList.add('hidden');
+            nextBtn.classList.add('hidden');
+
+            currentIdxEl.textContent = state.current + 1;
+            scoreEl.textContent = state.score;
+            const progress = (state.current / state.order.length) * 100;
+            progressBar.style.width = progress + '%';
+
+            qTypeBadge.textContent = q.type === 'tf' ? '참 / 거짓' : '객관식';
+            qCatBadge.textContent  = q.category || '';
+            qTextEl.textContent    = q.question;
+
+            const card = $('#question-card');
+            card.classList.remove('fade-in');
+            void card.offsetWidth;
+            card.classList.add('fade-in');
+
+            choicesEl.innerHTML = '';
+            const choices = q.type === 'tf' ? ['참 (O)', '거짓 (X)'] : q.choices;
+
+            choices.forEach((text, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn w-full text-left border-2 border-stone-200 bg-white rounded-lg p-4 font-medium text-stone-700';
+                btn.textContent = text;
+                btn.dataset.idx = idx;
+                btn.addEventListener('click', () => handleAnswer(idx, btn));
+                choicesEl.appendChild(btn);
+            });
+        }
+
+        function handleAnswer(selected, btnEl) {
+            if (state.answered) return;
+            state.answered = true;
+
+            const qIndex = state.order[state.current];
+            const q = QUESTIONS[qIndex];
+            const isCorrect = (selected === q.answer);
+
+            if (isCorrect) state.score += 1;
+            state.answers.push({ qIndex, selected, correct: isCorrect });
+
+            const allBtns = choicesEl.querySelectorAll('.choice-btn');
+            allBtns.forEach((b, idx) => {
+                b.disabled = true;
+                if (idx === q.answer) {
+                    b.classList.add('choice-correct');
+                    if (idx === selected) b.classList.add('choice-selected-correct');
+                } else if (idx === selected) {
+                    b.classList.add('choice-wrong', 'choice-selected-wrong');
+                }
+            });
+
+            feedbackEl.classList.remove('hidden', 'border-green-500', 'border-red-500', 'bg-green-50', 'bg-red-50');
+            if (isCorrect) {
+                feedbackEl.classList.add('border-green-500', 'bg-green-50');
+                feedbackTitle.textContent = '정답이에요! 🎯';
+                feedbackTitle.className = 'font-bold mb-1 text-green-700';
+            } else {
+                feedbackEl.classList.add('border-red-500', 'bg-red-50');
+                feedbackTitle.textContent = '아쉬워요. 다시 한 번 확인해볼까요?';
+                feedbackTitle.className = 'font-bold mb-1 text-red-700';
+            }
+            feedbackText.textContent = q.explanation;
+
+            scoreEl.textContent = state.score;
+            nextBtn.classList.remove('hidden');
+            nextBtn.textContent = (state.current + 1 === state.order.length) ? '결과 보기 →' : '다음 문항 →';
+        }
+
+        function nextQuestion() {
+            if (state.current + 1 < state.order.length) {
+                state.current += 1;
+                renderQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+
+            const total = state.order.length;
+            const score = state.score;
+            const ratio = score / total;
+
+            finalScoreEl.textContent = score;
+            finalTotalEl.textContent = total;
+            progressBar.style.width = '100%';
+
+            let emoji = '🎉', msg = '';
+            if (ratio === 1)        { emoji = '🏆'; msg = '완벽해요! 생성형 AI를 정확하게 이해하고 있어요.'; }
+            else if (ratio >= 0.8)  { emoji = '🎉'; msg = '훌륭해요! 핵심 개념과 윤리를 잘 알고 있어요.'; }
+            else if (ratio >= 0.6)  { emoji = '👍'; msg = '좋아요! 몇 가지 개념을 다시 살펴보면 더 단단해질 거예요.'; }
+            else if (ratio >= 0.4)  { emoji = '💪'; msg = '괜찮아요. 해설을 참고해 한 번 더 도전해보세요.'; }
+            else                    { emoji = '🌱'; msg = '시작이 반이에요! 해설을 천천히 읽어보고 다시 도전해봐요.'; }
+
+            resultEmoji.textContent = emoji;
+            resultMsg.textContent = msg;
+
+            reviewListEl.innerHTML = '';
+            state.answers.forEach((a, i) => {
+                const q = QUESTIONS[a.qIndex];
+                const row = document.createElement('div');
+                row.className = 'p-3 rounded-lg border ' +
+                    (a.correct ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50');
+
+                const head = document.createElement('div');
+                head.className = 'flex items-start gap-2 mb-1';
+                const mark = document.createElement('span');
+                mark.className = 'font-bold ' + (a.correct ? 'text-green-700' : 'text-red-700');
+                mark.textContent = a.correct ? '✓' : '✗';
+                const title = document.createElement('p');
+                title.className = 'text-sm font-bold text-stone-800';
+                title.textContent = `${i + 1}. ${q.question}`;
+                head.appendChild(mark);
+                head.appendChild(title);
+
+                const correctText = q.type === 'tf'
+                    ? (q.answer === 0 ? '참 (O)' : '거짓 (X)')
+                    : q.choices[q.answer];
+
+                const body = document.createElement('p');
+                body.className = 'text-xs text-stone-600 ml-5';
+                body.textContent = `정답: ${correctText}`;
+
+                row.appendChild(head);
+                row.appendChild(body);
+                reviewListEl.appendChild(row);
+            });
+        }
+
+        function goToStart() {
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+            progressBar.style.width = '0%';
+        }
+
+        // === 이벤트 ===
+        startBtn.addEventListener('click', startQuiz);
+        restartBtn.addEventListener('click', startQuiz);
+        nextBtn.addEventListener('click', nextQuestion);
+        quitBtn.addEventListener('click', goToStart);
+
+        shuffleToggle.addEventListener('click', () => {
+            state.shuffle = !state.shuffle;
+            shuffleState.textContent = state.shuffle ? 'ON' : 'OFF';
+            shuffleState.classList.toggle('text-teal-700', state.shuffle);
+            shuffleState.classList.toggle('text-stone-400', !state.shuffle);
+            shuffleToggle.setAttribute('aria-pressed', String(state.shuffle));
+        });
+
+        // 키보드: 1~9 선택, Enter로 다음
+        document.addEventListener('keydown', (e) => {
+            if (quizScreen.classList.contains('hidden')) return;
+            if (e.key === 'Enter' && !nextBtn.classList.contains('hidden')) {
+                nextQuestion();
+                return;
+            }
+            const num = parseInt(e.key, 10);
+            if (!isNaN(num) && num >= 1) {
+                const btns = choicesEl.querySelectorAll('.choice-btn');
+                const target = btns[num - 1];
+                if (target && !target.disabled) target.click();
+            }
+        });
+    </script>
+</body>
+</html>
